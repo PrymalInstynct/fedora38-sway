@@ -31,24 +31,7 @@
 
 - name: Install VSCode Extensions (Not Idempotent)
   ansible.builtin.shell: "code --install-extension {{ item }}"
-  loop:
-    - rocketseat.theme-omni
-    - esbenp.prettier-vscode
-    - dbaeumer.vscode-eslint
-    - golang.go
-    - ms-vscode.cmake-tools
-    - HashiCorp.terraform
-    - britesnow.vscode-toggle-quotes
-    - mitchdenny.ecdc
-    - ms-kubernetes-tools.vscode-kubernetes-tools
-    - oderwat.indent-rainbow
-    - redhat.ansible
-    - signageos.signageos-vscode-sops
-    - usernamehw.errorlens
-    - fcrespo82.markdown-table-formatter
-    - ms-vscode-remote.remote-ssh
-    - ms-vscode-remote.remote-ssh-edit
-    - ms-vscode-remote.remote-containers
+  loop: "{{ vscode_exentions }}"
 
 - name: "Install .config Folders to {{ ansible_local_user }}"
   ansible.builtin.copy:
