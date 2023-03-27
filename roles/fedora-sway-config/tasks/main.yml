@@ -1,0 +1,8 @@
+---
+
+- name: Default Configurations
+  import_tasks: default-configs.yml
+  become: true
+
+- name: User Configurations
+  import_tasks: user-configs.yml

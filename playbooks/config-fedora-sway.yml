@@ -1,0 +1,6 @@
+---
+- name: Setup Local Fedora System
+  hosts: localhost
+  connection: local
+  roles:
+    - fedora-sway-config

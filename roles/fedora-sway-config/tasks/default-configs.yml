@@ -1,0 +1,131 @@
+---
+- name: Set Hostname
+  ansible.builtin.hostname:
+    name: fedora38-sway.prymal.linux
+    use: systemd
+
+- name: Install distribution-gpg-keys
+  ansible.builtin.dnf:
+    name: distribution-gpg-keys
+    state: present
+
+- name: Install Extra Repository GPG Keys
+  ansible.builtin.rpm_key:
+    key: "{{ item }}"
+    state: present
+  loop:
+    - /usr/share/distribution-gpg-keys/rpmfusion/RPM-GPG-KEY-rpmfusion-free-fedora-latest
+    - /usr/share/distribution-gpg-keys/rpmfusion/RPM-GPG-KEY-rpmfusion-nonfree-fedora-latest
+    - https://packages.microsoft.com/keys/microsoft.asc
+
+- name: Configure RPM Fusion Repos
+  ansible.builtin.dnf:
+    name:
+      - "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-branched.noarch.rpm"
+      - "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-branched.noarch.rpm"
+    state: present
+
+- name: Create vscode.repo
+  ansible.builtin.copy:
+    dest: /etc/yum.repos.d/vscode.repo
+    content: |
+      [code]
+      name=Visual Studio Code
+      baseurl=https://packages.microsoft.com/yumrepos/vscode
+      enabled=1
+      gpgcheck=1
+      gpgkey=https://packages.microsoft.com/keys/microsoft.asc
+
+- name: Create kubernetes.repo
+  ansible.builtin.copy:
+    dest: /etc/yum.repos.d/kubernetes.repo
+    content: |
+      [kubernetes]
+      name=Kubernetes
+      baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
+      enabled=1
+      gpgcheck=1
+      gpgkey=https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+
+- name: Install Default Packages
+  ansible.builtin.dnf:
+    name:
+      - vim
+      - neofetch
+      - htop
+      - code
+      - git
+      - bash-completion
+      - buildah
+      - skopeo
+      - podman
+      - xz
+      - gzip
+      - unzip
+      - curl
+      - wget
+      - discord
+      - direnv
+      - age
+      - kitty
+      - flatpak
+      - wofi
+      - python3-pip
+      - gnome-calculator
+      - virt-manager
+      - flameshot
+      - kubectl
+
+- name: Install Media Codecs
+  ansible.builtin.dnf:
+    name:
+      - gstreamer1-plugins-bad-*.x86_64
+      - gstreamer1-plugins-good-*.x86_64
+      - gstreamer1-plugins-base
+      - gstreamer1-plugin-openh264
+      - gstreamer1-libav
+    exclude: gstreamer1-plugins-bad-free-devel
+    state: present
+
+- name: Install Python Modules
+  ansible.builtin.pip:
+    name:
+      - yamllint
+      - ansible-lint
+    umask: "0022"
+    state: present
+
+- name: Install FiraCode Fonts
+  ansible.builtin.unarchive:
+    src: "{{ role_path }}/files/fonts/FiraCode.zip"
+    dest: /usr/share/fonts/
+    mode: 0644
+    owner: root
+    group: root
+    exclude:
+      - LICENSE
+      - readme.md
+
+- name: Install Meslo Fonts
+  ansible.builtin.unarchive:
+    src: "{{ role_path }}/files/fonts/Meslo.zip"
+    dest: /usr/share/fonts/
+    mode: 0644
+    owner: root
+    group: root
+    exclude:
+      - LICENSE
+      - readme.md
+
+- name: Remove Unwanted Packages
+  ansible.builtin.dnf:
+    name:
+      - PackageKit-command-not-found
+      - PackageKit-gstreamer-plugin
+    state: absent
+
+- name: Enable sshd Service
+  ansible.builtin.systemd:
+    name: sshd
+    state: started
+    enabled: true

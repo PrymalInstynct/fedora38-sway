@@ -1,0 +1,6 @@
+---
+- name: Reboot
+  ansible.builtin.reboot:
+
+- name: Reload Sway
+  ansible.builtin.shell: "swaymsg reload"

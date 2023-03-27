@@ -1,0 +1,77 @@
+{
+    "window.titleBarStyle": "custom",
+    "window.zoomLevel": 0,
+  
+    "editor.fontSize": 14,
+    "editor.fontFamily": "Meslo LG L",
+    "editor.tabSize": 2,
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.smoothScrolling": true,
+    "editor.cursorBlinking": "smooth",
+    "editor.mouseWheelZoom": true,
+    "editor.linkedEditing": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.bracketPairColorization.enabled": true,
+    "editor.guides.bracketPairs":"active",
+    "editor.hover.delay": 1500,
+  
+    "terminal.integrated.fontSize": 12,
+    "terminal.integrated.fontFamily": "Meslo LG L",
+    "terminal.integrated.localEchoLatencyThreshold": -1,
+    "terminal.integrated.shellIntegration.decorationsEnabled": "never",
+    "terminal.integrated.shellIntegration.enabled": false,
+    "terminal.integrated.scrollback": 10000,
+    "terminal.integrated.shellIntegration.history": 500,
+    "terminal.integrated.profiles.linux": {
+      "zsh": {
+        "path": "zsh"
+      }
+    },
+  
+    "eslint.validate": [
+      "javascript",
+      "javascriptreact",
+      "typescript",
+      "typescriptreact"
+    ],
+    "files.exclude": {
+      "**/.git": true,
+      "**/.svn": true,
+      "**/.hg": true,
+      "**/CVS": true,
+      "**/.DS_Store": true,
+      "**/node_modules": true,
+      "**/deps": true
+    },
+  
+    "files.trimFinalNewlines": true,
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+    "files.autoSave": "onWindowChange",
+  
+    "workbench.list.smoothScrolling": true,
+    "workbench.editor.highlightModifiedTabs": true,
+    "workbench.editor.showTabs": true,
+    "workbench.editor.labelFormat": "short",
+    "workbench.editor.enablePreview": false,
+    "workbench.startupEditor": "none",
+    "workbench.colorTheme": "Omni",
+  
+    "breadcrumbs.enabled": false,
+    "git.enableSmartCommit": true,
+  
+    "dev.containers.dockerPath": "podman",
+    "dev.containers.dockerComposePath": "podman-compose",
+    "security.workspace.trust.untrustedFiles": "open",
+    "git.confirmSync": false,
+    "explorer.confirmDelete": false,
+    "terminal.integrated.enableMultiLinePasteWarning": false,
+    "redhat.telemetry.enabled": false,
+    "ansible.validation.lint.arguments": "-c .github/linters/.ansible-lint",
+    "[python]": {
+        "editor.formatOnType": true
+    }
+  }
+  

@@ -1,0 +1,132 @@
+---
+- name: "Set Current User Variable"
+  set_fact:
+    ansible_local_user: "{{ lookup('pipe', 'id -un') | d(lookup('pipe', 'whoami'), True) | d(lookup('env', 'USER'), True) |  d(lookup('env', 'user'), True) |  d(lookup('env', 'LOGNAME'), True) }}"
+  failed_when: ansible_local_user == ''
+  run_once: true
+
+- name: Add the flathub repository remote to the user installation
+  community.general.flatpak_remote:
+    name: flathub
+    state: present
+    flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+    method: user
+
+- name: Install Flatpaks
+  community.general.flatpak:
+    remote: flathub
+    method: user
+    name:
+      - org.gimp.GIMP
+      - com.spotify.Client
+      - com.mojang.Minecraft
+      - com.brave.Browser
+      - com.slack.Slack
+  notify: Reboot
+
+- name: Set default shell to bash
+  ansible.builtin.user:
+    name: "{{ ansible_local_user }}"
+    shell: /bin/bash
+
+- name: Install VSCode Extensions (Not Idempotent)
+  ansible.builtin.shell: "code --install-extension {{ item }}"
+  loop:
+    - rocketseat.theme-omni
+    - esbenp.prettier-vscode
+    - dbaeumer.vscode-eslint
+    - golang.go
+    - ms-vscode.cmake-tools
+    - HashiCorp.terraform
+    - britesnow.vscode-toggle-quotes
+    - mitchdenny.ecdc
+    - ms-kubernetes-tools.vscode-kubernetes-tools
+    - oderwat.indent-rainbow
+    - redhat.ansible
+    - signageos.signageos-vscode-sops
+    - usernamehw.errorlens
+    - fcrespo82.markdown-table-formatter
+    - ms-vscode-remote.remote-ssh
+    - ms-vscode-remote.remote-ssh-edit
+    - ms-vscode-remote.remote-containers
+
+- name: "Install .config Folders to {{ ansible_local_user }}"
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /home/{{ ansible_local_user }}/.config/
+    owner: "{{ ansible_local_user }}"
+    group: "{{ ansible_local_user }}"
+  loop:
+    - kitty
+    - sway
+    - swaylock
+    - waybar
+    - wofi
+  notify: Reload Sway
+
+- name: "Install .config Files to {{ ansible_local_user }}"
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/home/{{ ansible_local_user }}/.config/{{ item }}"
+    owner: "{{ ansible_local_user }}"
+    group: "{{ ansible_local_user }}"
+  loop:
+    - Code/Preferences
+    - Code/User/settings.json
+    - Thunar/uca.xml
+
+- name: "Create .gitconfig for {{ ansible_local_user }}"
+  ansible.builtin.template:
+    src: .gitconfig.j2
+    dest: "/home/{{ ansible_local_user }}/.gitconfig"
+    mode: 0660
+    owner: "{{ ansible_local_user }}"
+    group: "{{ ansible_local_user }}"
+
+- name: "Set .config File Permissions for {{ ansible_local_user }}"
+  ansible.builtin.file:
+    path: "/home/{{ ansible_local_user }}/.config/{{ item }}"
+    mode: 0750
+    owner: "{{ ansible_local_user }}"
+    group: "{{ ansible_local_user }}"
+  loop:
+    - swaylock/lock.sh
+    - waybar/scripts/power-menu.sh
+  notify: Reload Sway
+
+- name: "Create ~/.local/bin for {{ ansible_local_user }}"
+  ansible.builtin.file:
+    path: "/home/{{ ansible_local_user }}/.local/bin"
+    state: directory
+    mode: 0750
+    owner: "{{ ansible_local_user }}"
+    group: "{{ ansible_local_user }}"
+
+- name: Install Sway Scripts
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/home/{{ ansible_local_user }}/.local/bin/"
+    mode: 0750
+    owner: "{{ ansible_local_user }}"
+    group: "{{ ansible_local_user }}"
+  loop:
+    - scripts/sway-start-apps
+    - scripts/sway-toolwait
+  notify: Reload Sway
+
+- name: Create Desktop Backgrounds Folder
+  ansible.builtin.file:
+    path: "/home/{{ ansible_local_user }}/.images"
+    state: directory
+    mode: 0750
+    owner: "{{ ansible_local_user }}"
+    group: "{{ ansible_local_user }}"
+
+- name: Install Desktop Background Images
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/home/{{ ansible_local_user }}/.images/"
+  loop:
+    - images/space-ultrawide-wallpaper.jpg
+    - images/space-vertical-wallpaper.jpg
+    - images/wallpaper.jpg
