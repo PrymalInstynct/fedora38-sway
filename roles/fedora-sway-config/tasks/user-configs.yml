@@ -5,6 +5,11 @@
   failed_when: ansible_local_user == ''
   run_once: true
 
+- name: "Add {{ ansible_local_user }} to pkg-build group"
+  user:
+    name: { { ansible_local_user } }
+    group: pkg-build
+
 - name: Add the flathub repository remote to the user installation
   community.general.flatpak_remote:
     name: flathub

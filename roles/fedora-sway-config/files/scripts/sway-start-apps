@@ -1,22 +1,18 @@
 #!/usr/bin/env bash
 echo "Building workspaces, please wait ..." | wofi --dmenu & wofi_pid=$!
 
-swaymsg 'workspace 3'
-sway-toolwait -v 'thunar'
-sway-toolwait --nocheck -v 'gnome-calculator'
-
 swaymsg 'workspace 1'
-sway-toolwait --nocheck -v 'brave'
+sway-toolwait -v -n 'brave-browser'
 sway-toolwait -v 'code'
 sway-toolwait -v 'kitty'
 swaymsg 'focus prev'
 swaymsg 'resize set width 2500px'
 
 swaymsg 'workspace 2'
-sway-toolwait -v 'discord'
-sleep 4s
 sway-toolwait -v 'spotify'
 
-swaymsg 'workspace 1'
+swaymsg 'workspace 3'
+sway-toolwait -v 'thunar'
 
+swaymsg 'workspace 1'
 kill $wofi_pid

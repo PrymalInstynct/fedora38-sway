@@ -1,7 +1,7 @@
 ---
 - name: Set Hostname
   ansible.builtin.hostname:
-    name: fedora38-sway.prymal.linux
+    name: wks01.prymal.linux
     use: systemd
 
 - name: Install distribution-gpg-keys
@@ -17,6 +17,7 @@
     - /usr/share/distribution-gpg-keys/rpmfusion/RPM-GPG-KEY-rpmfusion-free-fedora-latest
     - /usr/share/distribution-gpg-keys/rpmfusion/RPM-GPG-KEY-rpmfusion-nonfree-fedora-latest
     - https://packages.microsoft.com/keys/microsoft.asc
+    - https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
 
 - name: Configure RPM Fusion Repos
   ansible.builtin.dnf:
@@ -24,6 +25,10 @@
       - "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-branched.noarch.rpm"
       - "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-branched.noarch.rpm"
     state: present
+
+- name: Configure Brave Browser Repo
+  ansible.builtin.dnf:
+    name: https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
 
 - name: Create vscode.repo
   ansible.builtin.copy:
@@ -75,6 +80,12 @@
       - virt-manager
       - flameshot
       - kubectl
+      - dnf-plugins-core
+      - brave-browser
+      - lpf-spotify-client
+      - qt5-qtgraphicaleffects
+      - qt5-qtquickcontrols2
+      - qt5-qtsvg
 
 - name: Install Media Codecs
   ansible.builtin.dnf:
@@ -117,12 +128,29 @@
       - LICENSE
       - readme.md
 
+- name: Install RobotoMono Fonts
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/astronaut-theme/Fonts/"
+    dest: "/usr/share/fonts/"
+
 - name: Remove Unwanted Packages
   ansible.builtin.dnf:
     name:
       - PackageKit-command-not-found
       - PackageKit-gstreamer-plugin
+      - firefox
     state: absent
+
+- name: Install SDDM Login Theme
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/astronaut-theme"
+    dest: "/usr/share/sddm/themes/"
+
+- name: Enable Astronaut SDDM Theme
+  lineinfile:
+    path: /etc/sddm.conf
+    regexp: "^#Current=01-breeze-fedora"
+    line: "Current=astronaut-theme"
 
 - name: Enable sshd Service
   ansible.builtin.systemd:
